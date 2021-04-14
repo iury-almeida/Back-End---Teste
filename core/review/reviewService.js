@@ -4,10 +4,8 @@ const repository = require('./reviewRepository');
 
 module.exports = {
     create,
-    update,
     select,
-    selectById,
-    // remove
+    selectById
 }
 
 async function create(params) {
@@ -19,18 +17,6 @@ async function create(params) {
         };
     } catch (error) {
         throw error;
-    }
-}
-
-async function update(params) {
-    try {
-        let result = await repository.update(params);
-        return {
-            result: result,
-            message: "review updated"
-        };
-    } catch (error) {
-        return error;
     }
 }
 
@@ -57,12 +43,3 @@ async function selectById(params) {
         return error;
     }
 }
-
-// async function remove(params) {
-//     try {
-//         let result = await repository.remove(params);
-//         return result;
-//     } catch (error) {
-//         return error;
-//     }
-// }

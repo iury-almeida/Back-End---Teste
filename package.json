@@ -4,7 +4,8 @@
   "description": "•\tO seu objetivo é criar uma API para simular um sistema de avaliação de prestadores de\r serviços da área de TI. Está API contará com endpoints para cadastrar os prestadores de\r serviços, relacionar uma avaliação a algum prestador de serviço e listar todas as avaliações\r de algum prestador de serviço.",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app"
   },
   "repository": {
     "type": "git",

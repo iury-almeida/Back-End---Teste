@@ -55,12 +55,12 @@ async function selectById(req, res) {
 }
 
 async function remove(req, res) {
-    // try {
-    //     let result = await service.remove(req.params);
-    //     res.status(200);
-    //     res.send(result);
-    // } catch (error) {
-    //     res.status(500);
-    //     res.send(error.message);
-    // }
+    try {
+        let result = await service.remove(req.params);
+        res.status(200);
+        res.send(result);
+    } catch (error) {
+        res.status(500);
+        res.send(error.message);
+    }
 }

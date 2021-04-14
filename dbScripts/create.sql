@@ -20,7 +20,7 @@ CREATE TABLE serviceprovider(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name VARCHAR(60),
     workingArea VARCHAR(60),
-    experieceSkils VARCHAR(80),
+    experienceSkills VARCHAR(80),
     createdAt DATETIME
 );
 
@@ -78,8 +78,9 @@ CREATE TABLE review(
     raterPhone VARCHAR(9),
     rateWritten TEXT,
     rate INT,
-    serviceprovider INT,
-    CONSTRAINT fk_serviceProvider_review FOREIGN KEY(serviceprovider) REFERENCES serviceprovider(id)
+    serviceProviderId INT,
+    createdAt DATETIME,
+    CONSTRAINT fk_serviceProvider_review FOREIGN KEY(serviceProviderId) REFERENCES serviceprovider(id)
 );
 
 --------------------------------------------------------------------------------------------------------

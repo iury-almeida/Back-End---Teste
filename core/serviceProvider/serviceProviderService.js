@@ -7,7 +7,7 @@ module.exports = {
     update,
     select,
     selectById,
-    // remove
+    remove
 }
 
 async function create(params) {
@@ -30,7 +30,7 @@ async function update(params) {
             message: "serviceProvider updated"
         };;
     } catch (error) {
-        return error;
+        throw error;
     }
 }
 
@@ -42,7 +42,7 @@ async function select(params) {
             message: "serviceProviders found"
         };
     } catch (error) {
-        return error;
+        throw error;
     }
 }
 
@@ -54,15 +54,18 @@ async function selectById(params) {
             message: "serviceProvider found"
         };
     } catch (error) {
-        return error;
+        throw error;
     }
 }
 
-// async function remove(params) {
-//     try {
-//         let result = await repository.remove(params);
-//         return result;
-//     } catch (error) {
-//         return error;
-//     }
-// }
+async function remove(params) {
+    try {
+        let result = await repository.remove(params);
+        return {
+            result: result,
+            message: "serviceProvider removed"
+        };
+    } catch (error) {
+        throw error;
+    }
+}

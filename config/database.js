@@ -31,7 +31,7 @@ try {
         CREATE TABLE IF NOT EXISTS serviceprovider(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             workingArea VARCHAR(60),
-            experieceSkils VARCHAR(80),
+            experienceSkills VARCHAR(80),
             name VARCHAR(60)
 
         );`);
@@ -80,28 +80,10 @@ try {
             raterPhone VARCHAR(9),
             rateWritten TEXT,
             rate INT,
-            serviceprovider INT,
+            serviceProviderId INT,
             createdAt DATETIME,
-            CONSTRAINT fk_serviceProvider_review FOREIGN KEY(serviceprovider) REFERENCES serviceprovider(id)
+            CONSTRAINT fk_serviceProvider_review FOREIGN KEY(serviceProviderId) REFERENCES serviceprovider(id)
         );`);
-
-        let test = await db.all(`
-            select * FROM serviceProvider sp
-                INNER JOIN addressServiceProvider asp 
-                    ON (asp.serviceProviderId = sp.id)
-                INNER JOIN address a
-                    ON (a.id = asp.addressId)
-                INNER JOIN phoneServiceProvider psp
-                    ON (psp.serviceProviderId = sp.id)
-                INNER JOIN phone p
-                    ON (p.id = psp.phoneId)
-                INNER JOIN emailServiceProvider esp
-                    ON (esp.serviceProviderId = sp.id)
-                INNER JOIN email e
-                    ON (e.id = esp.emailId)
-                WHERE sp.id = 2
-                `);
-        console.log(test);
 
     })()
 

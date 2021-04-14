@@ -2,7 +2,6 @@
 
 const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
-const { param } = require('../../config/server');
 
 let db = new sqlite3.Database('./database.sqlite', async (error) => {
     if (error) {
@@ -17,7 +16,8 @@ module.exports = {
     create,
     update,
     select,
-    selectById
+    selectById,
+    remove
 }
 
 async function create(params) {
@@ -26,10 +26,14 @@ async function create(params) {
 
         let result = await db.all(`
             INSERT INTO serviceProvider(
-                name
+                name,
+                workingArea,
+                experienceSkills
             )
             VALUES(
-                '${params.name}'
+                '${params.name}',
+                '${params.workingArea}',
+                '${params.experienceSkills}'
             );
         `);
 
@@ -160,15 +164,10 @@ async function update(params) {
         await db.all(`
             UPDATE serviceProvider
             SET
-                street = '${params.address[i].street}',
-                neighborhood = '${params.address[i].neighborhood}',
-                "number" = ${+params.address[i].number},
-                complement = '${params.address[i].complement || ''}',
-                cep = ${+params.address[i].cep},
-                state = '${params.address[i].city}',
-                city = '${params.address[i].state}',
-                main = ${params.address[i].main || false}
-            WHERE id = ${params.id};    
+                name = '${params.name}',
+                workingArea = '${params.workingArea}',
+                experienceSkills = '${params.experienceSkills}'
+            WHERE id = ${+params.id};    
         `);
 
         //referencing and adding service provider's addresses which is not in db 
@@ -266,7 +265,7 @@ async function update(params) {
 
                 emailResult = await db.all(`SELECT last_insert_rowid() as id;`);
 
-                params.email[i].id = addressResult[0].id;
+                params.email[i].id = emailResult[0].id;
 
                 await db.all(`
                     INSERT INTO emailServiceProvider(
@@ -275,7 +274,7 @@ async function update(params) {
                     )
                     VALUES(
                         ${+params.id},
-                        ${+emailResult[0].id}
+                        ${+emailResult[0].id} 
                     )
                 `);
             }
@@ -375,8 +374,12 @@ async function select(params) {
     try {
         let result = await db.all(
             `
-            SELECT *
-            FROM serviceProvider 
+            SELECT 
+                sp.id,
+                sp.name,
+                sp.workingArea as "workingArea",
+                sp.experienceSkills as "experienceSkills"
+            FROM serviceProvider sp
             ORDER BY id asc
         `
         );
@@ -392,7 +395,12 @@ async function selectById(params) {
     {
 
         let result = await db.all( `
-        SELECT * FROM serviceProvider sp
+        SELECT 
+            sp.id,
+            sp.name,
+            sp.workingArea as "workingArea",
+            sp.experienceSkills as "experienceSkills"
+        FROM serviceProvider sp
             WHERE sp.id = ${params.id}
             ORDER BY sp.id ASC
         `);
@@ -420,36 +428,29 @@ async function selectById(params) {
             
             ORDER BY a.id ASC
         `);
-
-        // FROM serviceProvider sp
-        // INNER JOIN addressServiceProvider asp 
-        //     ON (asp.serviceProviderId = ${+params.id})
-        // INNER JOIN address a
-        //     ON (a.id = asp.addressId)
-        // WHERE sp.id = ${+params.id}
         
         //stil need to check these two queries above
         let emailResult = await db.all(`
         SELECT 
             e.id, 
-            e.email 
-        FROM serviceProvider sp
-                INNER JOIN emailServiceProvider esp
-                    ON (esp.serviceProviderId = ${+params.id})
-                INNER JOIN email e
-                    ON (e.id = esp.emailId)
-                WHERE sp.id = ${+params.id}
-            ORDER BY e.id ASC
+            e.email,
+            e.main
+        FROM email e
+            INNER JOIN emailServiceProvider esp
+                ON (esp.serviceProviderId = ${+params.id})
+            WHERE e.id = esp.emailId
         `);
 
         let phoneResult = await db.all(`
-        SELECT * FROM serviceProvider sp
-                INNER JOIN phoneServiceProvider psp
-                    ON (psp.serviceProviderId = sp.id)
-                INNER JOIN phone p
-                    ON (p.id = psp.phoneId)
-                WHERE sp.id = ${+params.id}
-            ORDER BY p.id ASC
+        SELECT 
+            p.id, 
+            p.ddd,
+            p.number,
+            p.main
+        FROM phone p
+            INNER JOIN phoneServiceProvider psp
+                ON (psp.serviceProviderId = ${+params.id})
+            WHERE p.id = psp.phoneId
         `);
 
         addressResult.map(x => {
@@ -465,6 +466,33 @@ async function selectById(params) {
         });
 
         return result;
+    } catch (error) {
+        throw error;
+    }
+}
+
+
+async function remove(params) {
+    try 
+    {
+
+        await db.all( `
+            DELETE FROM addressServiceProvider WHERE serviceProviderid = ${params.id};
+        `);
+
+        await db.all( `
+            DELETE FROM emailServiceProvider WHERE serviceProviderid = ${params.id};
+        `);
+
+        await db.all( `
+            DELETE FROM phoneServiceProvider WHERE serviceProviderid = ${params.id};
+        `);
+
+        await db.all( `
+            DELETE FROM serviceProvider WHERE id = ${params.id};
+        `);
+       
+        return;
     } catch (error) {
         throw error;
     }

@@ -14,16 +14,13 @@ let db = new sqlite3.Database('./database.sqlite', async (error) => {
 
 module.exports = {
     create,
-    update,
     select,
     selectById
 }
 
 async function create(params) {
-//********REMEMBER TO ADD THE NEM FIELDS */
-    try {
 
-        let tes = await db.all('select 1');
+    try {
 
         let result = await db.all(`
             INSERT INTO review(
@@ -33,8 +30,8 @@ async function create(params) {
                 raterPhone,
                 rateWritten,
                 rate,
-                serviceprovider 
-                createAt
+                serviceProviderId, 
+                createdAt
             )
             VALUES(
                 '${params.raterName}',
@@ -43,7 +40,7 @@ async function create(params) {
                 '${+params.raterPhone}',
                 '${params.rateWritten}',
                 '${+params.rate}',
-                '${params.serviceProvider}',
+                '${params.serviceProviderId}',
                 '${new Date().toISOString()}'
             );
         `);
@@ -56,18 +53,7 @@ async function create(params) {
     }
 }
 
-async function update(params) {
-    try {
-
-       
-        return params.id;
-
-    } catch (error) {
-        throw error;
-    }
-}
-
-async function select(params) {
+async function select() {
     try {
         let result = await db.all(
             `
@@ -78,9 +64,9 @@ async function select(params) {
                 r.raterPhone as "raterPhone",
                 r.rateWritten as "rateWritten",
                 r.rate,
-                r.serviceprovider as "serviceProviderId"
-                r.createAt as "createAt",
-                sp.name
+                r.serviceproviderId as "serviceProviderId",
+                r.createdAt as "createdAt",
+                sp.name as "serviceProviderName"
             FROM review r
             INNER JOIN serviceProvider sp
                 ON r.serviceProviderId = sp.id 
@@ -107,8 +93,19 @@ async function selectById(params) {
         result[0].review = [];
         
         let reviewResult = await db.all(`
-        SELECT * FROM review r
-            WHERE r.id = ${+params.id}
+        SELECT 
+            r.id,
+            r.raterName as "raterName",
+            r.raterEmail as "raterEmail",
+            r.raterDDD as "raterDdd",
+            r.raterPhone as "raterPhone",
+            r.rateWritten as "rateWritten",
+            r.rate,
+            r.serviceproviderId as "serviceProviderId",
+            r.createdAt as "createdAt"
+         FROM review r
+            INNER JOIN serviceProvider sp
+                ON sp.id = ${+params.id}
             ORDER BY r.id ASC
         `);
 
